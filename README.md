@@ -3,7 +3,7 @@ Basic Implementation of a Merkle Tree in Scala
 
 # How can I run this?
 <li>Clone the repo
-<lil>Run the merkleTree.scala file
+<li>Run the merkleTree.scala file
 
 # Functionality
 <li>Add a transaction to a Merkle Tree
