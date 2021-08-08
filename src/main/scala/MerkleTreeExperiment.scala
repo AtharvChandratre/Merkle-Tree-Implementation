@@ -36,9 +36,14 @@ object MerkleTreeExperiment {
       return
     }
     else if(txHashList.length == 1) {
-      println("0 means hash the value in this output to the left of the tx hash, and vice versa for 1")
-      println("Merkle Proof is :")
-      proof.foreach(println)
+      if(proof.isEmpty) {
+        println("The transaction does not exist within this list of transactions")
+      }
+      else {
+        println("0 means hash the value in this output to the left of the tx hash, and vice versa for 1")
+        println("Merkle Proof is :")
+        proof.foreach(println)
+      }
       return
     }
     else {
