@@ -1,3 +1,4 @@
+import akka.japi.Pair
 import helpers.HashPairOfTransactions.hashPairOfTransactions
 import helpers.SHA256Hash.sha256Hash
 
@@ -25,15 +26,43 @@ object MerkleTreeExperiment {
     }
   }
 
-  def checkIfTransactionIsPresent (tx:String): Unit = {
+  @tailrec
+  def checkIfTransactionIsPresent(tx:String, txHashList: ArrayBuffer[String], proof: ArrayBuffer[Pair[Int,String]]): Unit = {
+    var newTx: String = tx
+    val tree = new ArrayBuffer[String]()
 
+    if(txHashList.isEmpty) {
+      println("There are no transactions to generate the proofs for")
+      return
+    }
+    else if(txHashList.length == 1) {
+      println("0 means hash the value in this output to the left of the tx hash, and vice versa for 1")
+      println("Merkle Proof is :")
+      proof.foreach(println)
+      return
+    }
+    else {
+      txHashList.grouped(2).foreach(x => {
+        val hash:String = hashPairOfTransactions(x)
+
+        if(x.contains(tx)) {
+          var side: Int = 0
+          if(tx.equals(x(0))) {
+            side=1
+          }
+          proof.append(Pair(side,x(side)))
+          newTx = hash
+        }
+        tree.append(hash)
+      })
+    }
+    checkIfTransactionIsPresent(newTx,tree,proof)
   }
 
   def main(args: Array[String]): Unit = {
 
     val transactionsList = new ArrayBuffer[String]()
     val transactionsHashes = new ArrayBuffer[String]()
-    var merkleTree = new ArrayBuffer[String]()
 
     do{
       println("_____________________________________________________")
@@ -53,7 +82,10 @@ object MerkleTreeExperiment {
         case "3" =>
           println("Merkle Root is : "+computeMerkleRoot(transactionsHashes))
         case "4" =>
-//
+          var tx = readLine("Enter the transaction: ")
+          tx = sha256Hash(tx)
+          val proof = new ArrayBuffer[Pair[Int,String]]()
+          checkIfTransactionIsPresent(tx,transactionsHashes,proof)
         case "5" => return;
         case _ => println("Please enter a valid input.");
       }
