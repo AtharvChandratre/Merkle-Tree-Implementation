@@ -8,6 +8,8 @@ import scala.io.StdIn.readLine
 
 object MerkleTreeExperiment {
 
+  var merkleProof = new ArrayBuffer[Pair[Int,String]]()
+
   def listTransactions (txList: ArrayBuffer[String]): Unit = {
     println("_____________________________________________________")
     println("\n*** List All Transactions ***\n")
@@ -43,6 +45,7 @@ object MerkleTreeExperiment {
         println("0 means hash the value in this output to the left of the tx hash, and vice versa for 1")
         println("Merkle Proof is :")
         proof.foreach(println)
+        merkleProof = proof
       }
       return
     }
@@ -62,6 +65,20 @@ object MerkleTreeExperiment {
       })
     }
     checkIfTransactionIsPresent(newTx,tree,proof)
+  }
+
+  def verifyMerkleProof (tx:String, proof: ArrayBuffer[Pair[Int,String]], merkleRoot:String): Boolean = {
+    var tempHash: String = tx
+    proof.foreach(pair => {
+      if (pair.first ==0) {
+        tempHash = hashPairOfTransactions(ArrayBuffer(pair.second,tempHash))
+      }
+      else {
+        tempHash = hashPairOfTransactions(ArrayBuffer(tempHash,pair.second))
+      }
+    })
+    if(tempHash.equals(merkleRoot)) true
+    else false
   }
 
   def main(args: Array[String]): Unit = {
@@ -91,6 +108,9 @@ object MerkleTreeExperiment {
           tx = sha256Hash(tx)
           val proof = new ArrayBuffer[Pair[Int,String]]()
           checkIfTransactionIsPresent(tx,transactionsHashes,proof)
+          println("Verifying merkle proof:")
+          val merkleRoot:String = computeMerkleRoot(transactionsHashes)
+          println(verifyMerkleProof(tx,merkleProof,merkleRoot))
         case "5" => return;
         case _ => println("Please enter a valid input.");
       }
