@@ -23,7 +23,15 @@ class MerkleTree {
     transactionsHashes.append(sha256Hash(tx))
   }
 
-  def getTransactionIDOfTransaction (tx:String): Int = {
+  def getTransactionsList:ArrayBuffer[String] = {
+    transactionsList
+  }
+
+  def getTransactionsHashes:ArrayBuffer[String] = {
+    transactionsHashes
+  }
+
+  def getTransactionID(tx:String): Int = {
     transactionsList.indexOf(tx)
   }
 
@@ -56,9 +64,14 @@ class MerkleTree {
 
     val proof = new MerkleProof()
     proof.position = txID
-    if(txID>=transactionsHashes.length) {
-      println("Enter a tx ID less than the number of transactions")
-      return new MerkleProof()
+    if (txHashList.isEmpty) {
+      //      println("There are no transactions to generate the proofs for")
+      proof.position = -1
+      return proof
+    }
+    else if(txID>=transactionsHashes.length) {
+//      println("Enter a tx ID less than the number of transactions")
+      return proof
     }
     val tx:String = transactionsHashes(txID)
     merkleProof = calculateMerkleProof(tx,proof,txHashList)
@@ -72,16 +85,10 @@ class MerkleTree {
     var newTx: String = tx
     val tree = new ArrayBuffer[String]()
 
-    if (txHashList.isEmpty) {
-      println("There are no transactions to generate the proofs for")
-      return proof
-    }
-    else if (txHashList.length == 1) {
+    if (txHashList.length == 1) {
       if (proof.nodes.isEmpty) {
-        println("The transaction does not exist within this list of transactions")
-      }
-      else {
-        println("Merkle Proof found")
+//        println("The transaction does not exist within this list of transactions")
+        proof.position = -1
       }
       return proof
     }
