@@ -2,6 +2,11 @@ package helpers
 
 import scala.collection.mutable.ArrayBuffer
 
+/**
+ * Class to represent a Merkle Proof
+ * Contains an Int position to represent the position of the transaction in the list of transactions
+ * Contains an ArrayBuffer of hashes, used to compute the Merkle Root during verification of the proof
+ */
 class MerkleProof {
 
   private[this] var _position: Int = -1
